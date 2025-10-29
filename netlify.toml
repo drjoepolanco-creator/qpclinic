@@ -1,0 +1,8 @@
+[build]
+  publish = "frontend"
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    cache-control = "public, max-age=60"

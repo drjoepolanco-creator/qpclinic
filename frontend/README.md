@@ -1,0 +1,1 @@
+Frontend v6.2 listo para Netlify (publish=frontend).

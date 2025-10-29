@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QP Clinic — v6.2 (Monorepo)</title>
+<style>body{font-family:system-ui,Segoe UI,Roboto,sans-serif;padding:24px;max-width:800px;margin:0 auto}</style>
+</head>
+<body>
+<h1>QP Clinic — Frontend v6.2</h1>
+<p>Publica esta carpeta en Netlify (publish: <code>frontend</code>). Configura la URL de la API con el botón ⚙︎ en el login de tu versión completa.</p>
+<hr>
+<p>Prueba de conexión:</p>
+<label>URL API</label>
+<input id="api" style="width:100%;padding:8px" placeholder="https://tu-api.onrender.com">
+<button id="ping" style="margin-top:8px">Probar /health</button>
+<pre id="out"></pre>
+<script>
+document.getElementById('ping').onclick=async()=>{
+  const base=document.getElementById('api').value.trim(); const out=document.getElementById('out');
+  out.textContent='...'; try{ const r=await fetch(base.replace(/\/$/,'')+'/health'); out.textContent=await r.text(); }catch(e){ out.textContent=String(e); }
+};
+</script>
+</body>
+</html>

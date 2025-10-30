@@ -63,35 +63,4 @@ app.get('/users', async (req, res) => {
 });
 
 // Pacientes (dummy temporal)
-app.get('/patients', async (req, res) => {
-  try {
-    const q = (req.query.q || '').toString();
-    const rows = await listPatients(q);
-    res.json(rows);
-  } catch (e) {
-    console.error('patients error', e);
-    res.status(500).json({ error: 'Error al cargar pacientes' });
-  }
-});
-
-// --- Bootstrap: migraciones, seed de usuarios y levantar servidor ---
-const PORT = process.env.PORT || 3000;
-
-(async function bootstrap() {
-  try {
-    await runMigrations();
-    await seedDefaultUsers(); // crea admin/admin si no existe (o admin/qp2025!)
-    app.listen(PORT, () => {
-      console.log(`API v1.2.1 listening on :${PORT}`);
-    });
-  } catch (e) {
-    console.error('Fatal startup error:', e);
-    process.exit(1);
-  }
-})();
-
-runMigrations()
-  .then(seedDefaultUsers)   // crea admin/medico/recep si la tabla estaba vacía
-  .then(() => app.listen(PORT, () => console.log('API v1.2.1 listening on :' + PORT)))
-  .catch(err => { console.error('Startup error', err); process.exit(1); });
-COPY backend/src/patients.js src/patients.js
+app.get('/patients', async (req,

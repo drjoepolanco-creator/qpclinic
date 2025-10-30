@@ -1,24 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QP Clinic — v6.2 (Monorepo)</title>
-<style>body{font-family:system-ui,Segoe UI,Roboto,sans-serif;padding:24px;max-width:800px;margin:0 auto}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QP Clinic — Expediente (v6.3)</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-<h1>QP Clinic — Frontend v6.2</h1>
-<p>Publica esta carpeta en Netlify (publish: <code>frontend</code>). Configura la URL de la API con el botón ⚙︎ en el login de tu versión completa.</p>
-<hr>
-<p>Prueba de conexión:</p>
-<label>URL API</label>
-<input id="api" style="width:100%;padding:8px" placeholder="https://tu-api.onrender.com">
-<button id="ping" style="margin-top:8px">Probar /health</button>
-<pre id="out"></pre>
-<script>
-document.getElementById('ping').onclick=async()=>{
-  const base=document.getElementById('api').value.trim(); const out=document.getElementById('out');
-  out.textContent='...'; try{ const r=await fetch(base.replace(/\/$/,'')+'/health'); out.textContent=await r.text(); }catch(e){ out.textContent=String(e); }
-};
-</script>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="brand__logo"></div>
+        <div class="brand__title">QP Clinic — Expediente v6.3</div>
+        <span id="envBadge" class="badge" title="Origen de API"></span>
+      </div>
+      <div class="toolbar">
+        <button id="btnApi" class="button button--ghost" title="Configurar API">⚙︎ Conexión</button>
+        <button id="btnLogout" class="button button--ghost" style="display:none;">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div id="view-login" class="card">
+      <h2>Iniciar sesión</h2>
+      <div class="row">
+        <div>
+          <label class="label" for="username">Usuario</label>
+          <input class="input" id="username" placeholder="admin" autofocus />
+        </div>
+        <div>
+          <label class="label" for="password">Contraseña</label>
+          <input class="input" id="password" type="password" placeholder="qp2025!" />
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button id="btnLogin" class="button">Entrar</button>
+        <button id="btnPing" class="button button--ghost">Probar /health</button>
+      </div>
+      <p class="small">Primera vez: usuario <span class="kbd">admin</span> / contraseña <span class="kbd">qp2025!</span>.</p>
+    </div>
+
+    <div id="view-home" class="card" style="display:none;">
+      <h2>Panel</h2>
+      <p id="hello"></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="goPatients" class="button">Pacientes</button>
+        <button id="goNewConsult" class="button button--ghost">Nueva consulta</button>
+      </div>
+    </div>
+
+    <div id="view-patients" class="card" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>Pacientes</h2>
+        <div style="display:flex;gap:8px">
+          <input id="q" class="input" placeholder="Buscar por nombre…" />
+          <button id="btnSearch" class="button button--ghost">Buscar</button>
+          <button id="btnReload" class="button button--ghost">Recargar</button>
+        </div>
+      </div>
+      <table class="table" id="tbl"></table>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary><strong>Ayuda rápida</strong></summary>
+        <ul>
+          <li>Configura la URL de API con el botón <strong>⚙︎ Conexión</strong>.</li>
+          <li>Usa <span class="kbd">admin</span> / <span class="kbd">qp2025!</span> y luego cambia tu contraseña.</li>
+          <li>Si algo falla, prueba <span class="kbd">/health</span> o revisa CORS en el backend.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <!-- Modal API -->
+  <div id="modalApi" class="modal">
+    <div class="modal__panel">
+      <h3>Conexión a API</h3>
+      <label class="label" for="apiBase">URL base de la API</label>
+      <input class="input" id="apiBase" placeholder="https://qpclinic.onrender.com" />
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+        <button id="btnApiCancel" class="button button--ghost">Cancelar</button>
+        <button id="btnApiSave" class="button">Guardar</button>
+      </div>
+      <p class="small">Ejemplo válido: <code>https://qpclinic.onrender.com</code> (sin <code>/health</code>).</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="./app.js"></script>
 </body>
 </html>

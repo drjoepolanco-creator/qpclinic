@@ -94,3 +94,4 @@ runMigrations()
   .then(seedDefaultUsers)   // crea admin/medico/recep si la tabla estaba vacía
   .then(() => app.listen(PORT, () => console.log('API v1.2.1 listening on :' + PORT)))
   .catch(err => { console.error('Startup error', err); process.exit(1); });
+COPY backend/src/patients.js src/patients.js

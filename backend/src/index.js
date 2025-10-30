@@ -1,3 +1,4 @@
+import { listPatients } from './patients.js';
 import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
@@ -44,6 +45,17 @@ app.post('/auth/login', async (req, res) => {
 app.get('/users', async (req, res) => {
   const { rows } = await query('SELECT id, username, role, name, disabled, created_at FROM users ORDER BY created_at DESC');
   res.json(rows);
+});
+// GET /patients?q=texto  → devuelve pacientes (dummy temporal)
+app.get('/patients', async (req, res) => {
+  try {
+    const q = (req.query.q || '').toString();
+    const rows = await listPatients(q);
+    res.json(rows);
+  } catch (e) {
+    console.error('patients error', e);
+    res.status(500).json({ error: 'Error al cargar pacientes' });
+  }
 });
 
 const PORT = process.env.PORT || 3000;

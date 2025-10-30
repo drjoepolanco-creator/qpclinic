@@ -1,3 +1,4 @@
+// backend/src/index.js
 import { listPatients } from './patients.js';
 import 'dotenv/config';
 import express from 'express';
@@ -33,20 +34,35 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 // Auth
 app.post('/auth/login', async (req, res) => {
-  const { username, password } = req.body || {};
-  if (!username || !password) return res.status(400).json({ error: 'username & password required' });
-  const u = await login(username, password);
-  if (!u) return res.status(401).json({ error: 'Credenciales inválidas' });
-  const token = signToken(u);
-  res.json({ token, user: u });
+  try {
+    const { username, password } = req.body || {};
+    if (!username || !password) {
+      return res.status(400).json({ error: 'username & password required' });
+    }
+    const u = await login(username, password);
+    if (!u) return res.status(401).json({ error: 'Credenciales inválidas' });
+    const token = signToken(u);
+    res.json({ token, user: u });
+  } catch (e) {
+    console.error('login error', e);
+    res.status(500).json({ error: 'Error de autenticación' });
+  }
 });
 
 // Users (listado simple para verificar)
 app.get('/users', async (req, res) => {
-  const { rows } = await query('SELECT id, username, role, name, disabled, created_at FROM users ORDER BY created_at DESC');
-  res.json(rows);
+  try {
+    const { rows } = await query(
+      'SELECT id, username, role, name, disabled, created_at FROM users ORDER BY created_at DESC'
+    );
+    res.json(rows);
+  } catch (e) {
+    console.error('users error', e);
+    res.status(500).json({ error: 'Error al cargar usuarios' });
+  }
 });
-// GET /patients?q=texto  → devuelve pacientes (dummy temporal)
+
+// Pacientes (dummy temporal)
 app.get('/patients', async (req, res) => {
   try {
     const q = (req.query.q || '').toString();
@@ -58,7 +74,22 @@ app.get('/patients', async (req, res) => {
   }
 });
 
+// --- Bootstrap: migraciones, seed de usuarios y levantar servidor ---
 const PORT = process.env.PORT || 3000;
+
+(async function bootstrap() {
+  try {
+    await runMigrations();
+    await seedDefaultUsers(); // crea admin/admin si no existe (o admin/qp2025!)
+    app.listen(PORT, () => {
+      console.log(`API v1.2.1 listening on :${PORT}`);
+    });
+  } catch (e) {
+    console.error('Fatal startup error:', e);
+    process.exit(1);
+  }
+})();
+
 runMigrations()
   .then(seedDefaultUsers)   // crea admin/medico/recep si la tabla estaba vacía
   .then(() => app.listen(PORT, () => console.log('API v1.2.1 listening on :' + PORT)))

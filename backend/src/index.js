@@ -24,8 +24,7 @@ async function runMigrations() {
     return;
   }
   const sql = fs.readFileSync(migFile, 'utf8');
-  // El SQL usa CREATE TABLE IF NOT EXISTS, por lo que es idempotente
-  await query(sql);
+  await query(sql); // El SQL usa CREATE TABLE IF NOT EXISTS (idempotente)
   console.log('Migrations applied.');
 }
 
@@ -63,4 +62,29 @@ app.get('/users', async (req, res) => {
 });
 
 // Pacientes (dummy temporal)
-app.get('/patients', async (req,
+app.get('/patients', async (req, res) => {
+  try {
+    const q = (req.query.q || '').toString();
+    const rows = await listPatients(q);
+    res.json(rows);
+  } catch (e) {
+    console.error('patients error', e);
+    res.status(500).json({ error: 'Error al cargar pacientes' });
+  }
+});
+
+// --- Bootstrap: migraciones, seed y servidor ---
+const PORT = process.env.PORT || 3000;
+
+(async function bootstrap() {
+  try {
+    await runMigrations();
+    await seedDefaultUsers(); // crea admin si falta
+    app.listen(PORT, () => {
+      console.log(`API v1.2.1 listening on :${PORT}`);
+    });
+  } catch (e) {
+    console.error('Fatal startup error:', e);
+    process.exit(1);
+  }
+})();

@@ -1,14 +1,21 @@
+# backend/Dockerfile
 FROM node:18-alpine
 
 WORKDIR /app
 
-# dependencias
+# 1) Instalar dependencias (no requiere package-lock)
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
-# Copiar TODA la carpeta src y migraciones
+# 2) Copiar código y migraciones
 COPY backend/src ./src
 COPY backend/migrations ./migrations
 
+# 3) Variables básicas
+ENV NODE_ENV=production
+ENV PORT=3000
+
 EXPOSE 3000
-CMD ["node","src/index.js"]
+
+# 4) Arranque
+CMD ["node", "src/index.js"]
